@@ -1,0 +1,14 @@
+SELECT *
+FROM (superstore)
+ORDER BY price;
+
+SELECT *
+FROM (superstore)
+WHERE average_rating < 4.5
+GROUP BY item_name; 
+
+SELECT category, item_name, SUM(price) AS total_price
+FROM superstore
+WHERE category = 'Electronics'
+GROUP BY category, item_name;
+
