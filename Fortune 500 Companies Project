@@ -1,0 +1,35 @@
+SELECT *,
+  CASE WHEN healthcare_benefits = 1 THEN "Has Healthcare"
+       ELSE "Does Not Have Healthcare"
+  END AS healthcare
+FROM fortune_companies
+
+SELECT *,
+  CASE WHEN paid_time_off_days > 0 THEN "Has PTO"
+       ELSE "Does Not Have PTO"
+  END AS pto
+FROM fortune_companies
+
+SELECT *,
+  CASE WHEN maternity_leave_weeks=0 THEN "No Parental Leave"
+        WHEN maternity_leave_weeks<=4 THEN "Mid Parental Leave"
+        WHEN maternity_leave_weeks<=6 THEN "Good Parental Leave"
+        ELSE "Great Parental Leave"
+  END AS parental_leave
+FROM fortune_companies
+
+SELECT industry, AVG(revenue) AS avg_revenue
+FROM fortune_companies
+GROUP BY industry
+HAVING AVG(revenue) > 250
+ORDER BY avg_revenue DESC;
+
+SELECT company_name, industry, revenue, parental_leave
+FROM fortune_companies
+WHERE industry = 'Technology' AND revenue > 300 AND parental_leave = 'Good Parental Leave';
+
+SELECT company_name, industry, revenue, healthcare_benefits
+FROM fortune_companies
+WHERE industry = 'Technology' AND revenue > 300 AND healthcare_benefits = 1;
+
+
