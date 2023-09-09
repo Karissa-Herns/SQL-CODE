@@ -1,35 +1,43 @@
+-- Query 1: Count orders in FebSales with a 6-character orderID
 SELECT COUNT(orderID) AS OrderCount
 FROM BIT_DB.FebSales
 WHERE LENGTH(orderID) = 6 AND orderID <> '';
 
-SELECT COUNT(c.acctnum) FROM BIT_DB.customers c
+-- Query 2: Count customers with orders in FebSales having 6-character orderID
+SELECT COUNT(c.acctnum)
+FROM BIT_DB.customers c
 INNER JOIN BIT_DB.FebSales fs ON c.order_id = fs.orderID
 WHERE LENGTH(fs.orderID) = 6 AND fs.orderID <> '';
 
-SELECT distinct(Product), MIN(price) FROM BIT_DB.JanSales js
-WHERE length(js.orderID) = 6 AND js.orderID <> ''
-Group BY Product, price
+-- Query 3: Find the product with the minimum price in JanSales
+SELECT DISTINCT(Product), MIN(price)
+FROM BIT_DB.JanSales js
+WHERE LENGTH(js.orderID) = 6 AND js.orderID <> ''
+GROUP BY Product, price
 ORDER BY price ASC LIMIT 1;
 
-SELECT Product, ROUND(SUM(Quantity)*price) as revenue
+-- Query 4: Calculate revenue for each product in JanSales
+SELECT Product, ROUND(SUM(Quantity) * price) AS revenue
 FROM BIT_DB.JanSales js
-WHERE length(js.orderID) = 6 AND js.orderID <> ''
+WHERE LENGTH(js.orderID) = 6 AND js.orderID <> ''
 GROUP BY js.Product;
 
-SELECT Product, location, SUM(Quantity), ROUND(SUM(Quantity)*price) as revenue
+-- Query 5: Calculate revenue and total quantity for each product in FebSales in a specific location
+SELECT Product, location, SUM(Quantity), ROUND(SUM(Quantity) * price) AS revenue
 FROM BIT_DB.FebSales
 WHERE location = '548 Lincoln St, Seattle, WA 98101'
 GROUP BY Product;
 
-SELECT COUNT(distinct c.acctnum), ROUND(AVG(Quantity*price), 2)
-FROM BIT_DB.FebSales fs JOIN BIT_DB.customers c ON c.order_ID=fs.orderID
+-- Query 6: Count distinct customers and calculate average revenue for orders in FebSales with quantity > 2
+SELECT COUNT(DISTINCT c.acctnum), ROUND(AVG(Quantity * price), 2)
+FROM BIT_DB.FebSales fs
+JOIN BIT_DB.customers c ON c.order_ID = fs.orderID
 WHERE fs.quantity > 2
-AND length(fs.orderID)=6 AND fs.orderID<>''
+AND LENGTH(fs.orderID) = 6 AND fs.orderID <> ''
 GROUP BY fs.orderID;
 
-
-SELECT Product, Sum(Quantity), location 
+-- Query 7: Calculate total quantity of products sold in Los Angeles in FebSales
+SELECT Product, SUM(Quantity), location 
 FROM BIT_DB.FebSales fs
 WHERE fs.location LIKE '%Los Angeles%'
 GROUP BY Product;
-
