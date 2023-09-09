@@ -39,5 +39,11 @@ GROUP BY fs.orderID;
 -- Query 7: Calculate total quantity of products sold in Los Angeles in FebSales
 SELECT Product, SUM(Quantity), location 
 FROM BIT_DB.FebSales fs
-WHERE fs.location LIKE '%Los Angeles%'
-GROUP BY Product;
+
+-- Query 8: Display the locations in New York received at least 3 orders in January, and how many orders they each received?
+SELECT DISTINCT(location), COUNT(orderID) AS OrderCount
+FROM BIT_DB.JanSales js
+WHERE LENGTH(js.orderID) = 6 AND js.orderID <> ''
+AND location LIKE '%New York%'
+GROUP BY location
+HAVING OrderCount > 2;
