@@ -47,3 +47,34 @@ WHERE LENGTH(js.orderID) = 6 AND js.orderID <> ''
 AND location LIKE '%New York%'
 GROUP BY location
 HAVING OrderCount > 2;
+
+-- Query 9: Calculate the number of each type of headphones sold in February
+SELECT Product, COUNT(orderID) AS OrderCount
+FROM BIT_DB.FebSales as fs
+WHERE LENGTH(fs.orderID) = 6 AND fs.orderID <> ''
+AND Product LIKe '%headphone%'
+GROUP BY Product
+HAVING OrderCount > 0;
+
+-- Query 10: Calculate average amount spent by an account in February
+SELECT ROUND(SUM(fs.price) / COUNT(DISTINCT c.acctnum), 2) AS Average_Spent
+FROM BIT_DB.customers c
+JOIN BIT_DB.FebSales fs ON c.order_id = fs.orderID
+WHERE LENGTH(fs.orderID) = 6 AND fs.orderID <> '';
+
+-- Query 11: Calculate average quantity of items purhased in February
+SELECT SUM(fs.Quantity) / COUNT(DISTINCT c.acctnum) AS Avg_Quantity
+FROM BIT_DB.customers c
+JOIN BIT_DB.FebSales fs ON c.order_id = fs.orderID
+WHERE LENGTH(fs.orderID) = 6 AND fs.orderID <> '';
+
+-- Query 12: Calculate the product that produced the most revenue in January
+SELECT Product, ROUND(MAX((SUM(Quantity) * price), 2)) AS revenue
+FROM BIT_DB.JanSales js
+WHERE LENGTH(js.orderID) = 6 AND js.orderID <> ''
+GROUP BY js.Product
+ORDER BY revenue DESC
+LIMIT 1;
+
+
+
