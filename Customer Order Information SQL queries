@@ -26,3 +26,10 @@ FROM BIT_DB.FebSales fs JOIN BIT_DB.customers c ON c.order_ID=fs.orderID
 WHERE fs.quantity > 2
 AND length(fs.orderID)=6 AND fs.orderID<>''
 GROUP BY fs.orderID;
+
+
+SELECT Product, Sum(Quantity), location 
+FROM BIT_DB.FebSales fs
+WHERE fs.location LIKE '%Los Angeles%'
+GROUP BY Product;
+
