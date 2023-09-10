@@ -1,23 +1,23 @@
--- Create the Spotifydata table
+-- Create the Spotifydata table with the specified columns
 CREATE TABLE BIT_DB.Spotifydata (
-    id integer PRIMARY KEY,
-    artist_name varchar NOT NULL,
-    track_name varchar NOT NULL,
-    track_id varchar NOT NULL,
-    popularity integer NOT NULL,
-    danceability decimal(4,3) NOT NULL,
-    energy decimal(4,3) NOT NULL,
-    song_key integer NOT NULL,
-    loudness decimal(5,3) NOT NULL,
-    song_mode integer NOT NULL,
-    speechiness decimal(5,4) NOT NULL,
-    acousticness decimal(6,5) NOT NULL,
-    instrumentalness decimal(8,7) NOT NULL,
-    liveness decimal(5,4) NOT NULL,
-    valence decimal(4,3) NOT NULL,
-    tempo decimal(6,3) NOT NULL,
-    duration_ms integer NOT NULL,
-    time_signature integer NOT NULL
+  id integer PRIMARY KEY,
+  artist_name varchar NOT NULL,
+  track_name varchar NOT NULL,
+  track_id varchar NOT NULL,
+  popularity integer NOT NULL,
+  danceability decimal(4,3) NOT NULL,
+  energy decimal(4,3) NOT NULL,
+  song_key integer NOT NULL,
+  loudness decimal(5,3) NOT NULL,
+  song_mode integer NOT NULL,
+  speechiness decimal(5,4) NOT NULL,
+  acousticness decimal(6,5) NOT NULL,
+  instrumentalness decimal(8,7) NOT NULL,
+  liveness decimal(5,4) NOT NULL,
+  valence decimal(4,3) NOT NULL,
+  tempo decimal(6,3) NOT NULL,
+  duration_ms integer NOT NULL,
+  time_signature integer NOT NULL
 );
 
 -- Select the first 5 rows from the Spotifydata table
@@ -30,6 +30,7 @@ ORDER BY popularity DESC
 LIMIT 15;
 
 -- Calculate track counts, total popularity, and average popularity for artists with more than 1 track
+-- and display the top 10 most popular artists with multiple hits
 SELECT artist_name, 
        COUNT(*) AS track_count, 
        SUM(popularity) AS total_popularity, 
@@ -40,7 +41,7 @@ HAVING track_count > 1
 ORDER BY average_popularity DESC
 LIMIT 10;
 
--- Calculate maximum, minimum, and average danceability
+-- Calculate maximum, minimum, and average danceability across all tracks
 SELECT MAX(danceability) AS Max_Danceability,
        MIN(danceability) AS Min_Danceability,
        AVG(danceability) AS AVG_Danceability
@@ -52,9 +53,47 @@ FROM BIT_DB.Spotifydata
 ORDER BY popularity DESC 
 LIMIT 10;
 
--- Select artist_name, track_name, energy, danceability, and popularity for tracks with popularity >= 90, ordering by popularity in descending order and limiting to 20 rows
+-- Select artist_name, track_name, danceability, and popularity for tracks with popularity >= 90,
+-- ordering by popularity in descending order and limiting to 10 rows
+SELECT artist_name, track_name, danceability, popularity
+FROM BIT_DB.Spotifydata
+WHERE popularity >= 90
+ORDER BY danceability DESC 
+LIMIT 10;
+
+-- Select artist_name, track_name, energy, danceability, and popularity for tracks with popularity >= 90,
+-- ordering by popularity in descending order and limiting to 20 rows
 SELECT artist_name, track_name, energy, danceability, popularity
 FROM BIT_DB.Spotifydata
 WHERE popularity >= 90
 ORDER BY popularity DESC
 LIMIT 20;
+
+
+
+-- Calculate the average popularity for each artist
+WITH ArtistPopularity AS (
+  SELECT
+    s.artist_name, AVG(s.popularity) AS average_popularity  
+  FROM Spotifydata s
+  GROUP BY s.artist_name
+)
+
+-- Select artist names and their average popularity, labeling "TOP STAR" if average popularity is greater than 89
+SELECT
+  ap.artist_name,
+  ap.avg_popularity,
+  CASE WHEN ap.avg_popularity > 89 THEN 'TOP STAR' ELSE '' END AS label
+FROM ArtistPopularity ap;
+
+
+
+
+
+
+
+
+
+
+
+
