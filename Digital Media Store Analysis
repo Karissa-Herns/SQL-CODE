@@ -1,0 +1,157 @@
+-- Create a common table expression (CTE) to calculate customer spending
+WITH CustomerSpending AS (
+    SELECT
+        c.CustomerId,
+        c.FirstName || ' ' || c.LastName AS CustomerName,
+        SUM(i.Total) AS TotalSpent
+    FROM customers c
+    JOIN invoices i ON c.CustomerId = i.CustomerId
+    GROUP BY c.CustomerId, CustomerName
+)
+
+-- Select all customers and their preferred music genre(s)
+SELECT
+    cs.CustomerName,
+    cs.TotalSpent,
+    (
+        SELECT g.Name
+        FROM invoice_items ii
+        JOIN tracks t ON ii.TrackId = t.TrackId
+        JOIN genres g ON t.GenreId = g.GenreId
+        WHERE ii.InvoiceId IN (SELECT InvoiceId FROM invoices WHERE CustomerId = cs.CustomerId)
+        GROUP BY g.Name
+        ORDER BY COUNT(*) DESC
+        LIMIT 1
+    ) AS PreferredGenre
+FROM CustomerSpending cs;
+
+-- Calculate the customer retention rate by month
+
+-- Create a common table expression (CTE) to calculate customer retention
+WITH CustomerRetention AS (
+    SELECT
+        DATE(i.InvoiceDate, 'start of month') AS InvoiceMonth,
+        c.CustomerId,
+        CASE
+            WHEN MIN(i.InvoiceDate) = MIN(i2.InvoiceDate) THEN 'New Customer'
+            ELSE 'Returning Customer'
+        END AS CustomerSegment
+    FROM invoices i
+    JOIN customers c ON i.CustomerId = c.CustomerId
+    LEFT JOIN invoices i2 ON i.CustomerId = i2.CustomerId AND i2.InvoiceId < i.InvoiceId
+    GROUP BY InvoiceMonth, c.CustomerId
+)
+
+-- Select and aggregate customer retention data
+SELECT
+    cr.InvoiceMonth,
+    cr.CustomerSegment,
+    COUNT(DISTINCT cr.CustomerId) AS CustomerCount,
+    1.0 * COUNT(DISTINCT CASE WHEN cr.CustomerSegment = 'Returning Customer' THEN cr.CustomerId END) / COUNT(DISTINCT cr.CustomerId) AS RetentionRate
+FROM CustomerRetention cr
+GROUP BY cr.InvoiceMonth, cr.CustomerSegment
+ORDER BY cr.InvoiceMonth, cr.CustomerSegment;
+
+-- Calculate sales channel effectiveness
+-- Create a common table expression (CTE) to calculate revenue by sales channel
+WITH SalesChannelRevenue AS (
+    SELECT
+        i.InvoiceId,-- Create a common table expression (CTE) to calculate customer spending
+WITH CustomerSpending AS (
+    SELECT
+        c.CustomerId,
+        c.FirstName || ' ' || c.LastName AS CustomerName,
+        SUM(i.Total) AS TotalSpent
+    FROM customers c
+    JOIN invoices i ON c.CustomerId = i.CustomerId
+    GROUP BY c.CustomerId, CustomerName
+)
+
+-- Select all customers and their preferred music genre(s)
+SELECT
+    cs.CustomerName,
+    cs.TotalSpent,
+    (
+        SELECT g.Name
+        FROM invoice_items ii
+        JOIN tracks t ON ii.TrackId = t.TrackId
+        JOIN genres g ON t.GenreId = g.GenreId
+        WHERE ii.InvoiceId IN (SELECT InvoiceId FROM invoices WHERE CustomerId = cs.CustomerId)
+        GROUP BY g.Name
+        ORDER BY COUNT(*) DESC
+        LIMIT 1
+    ) AS PreferredGenre
+FROM CustomerSpending cs;
+
+-- Calculate the customer retention rate by month
+
+-- Create a common table expression (CTE) to calculate customer retention
+WITH CustomerRetention AS (
+    SELECT
+        DATE(i.InvoiceDate, 'start of month') AS InvoiceMonth,
+        c.CustomerId,
+        CASE
+            WHEN MIN(i.InvoiceDate) = MIN(i2.InvoiceDate) THEN 'New Customer'
+            ELSE 'Returning Customer'
+        END AS CustomerSegment
+    FROM invoices i
+    JOIN customers c ON i.CustomerId = c.CustomerId
+    LEFT JOIN invoices i2 ON i.CustomerId = i2.CustomerId AND i2.InvoiceId < i.InvoiceId
+    GROUP BY InvoiceMonth, c.CustomerId
+)
+
+-- Select and aggregate customer retention data
+SELECT
+    cr.InvoiceMonth,
+    cr.CustomerSegment,
+    COUNT(DISTINCT cr.CustomerId) AS CustomerCount,
+    1.0 * COUNT(DISTINCT CASE WHEN cr.CustomerSegment = 'Returning Customer' THEN cr.CustomerId END) / COUNT(DISTINCT cr.CustomerId) AS RetentionRate
+FROM CustomerRetention cr
+GROUP BY cr.InvoiceMonth, cr.CustomerSegment
+ORDER BY cr.InvoiceMonth, cr.CustomerSegment;
+
+-- Calculate sales channel effectiveness
+-- Create a common table expression (CTE) to calculate revenue by sales channel
+WITH SalesChannelRevenue AS (
+    SELECT
+        i.InvoiceId,
+        CASE
+            WHEN UPPER(c.FirstName) || ' ' || UPPER(c.LastName) LIKE '%ONLINE%' THEN 'Online'
+            WHEN UPPER(c.Address) LIKE '%WEB%' THEN 'Online'
+            WHEN c.Country IN ('USA', 'Canada') THEN 'In-Store'
+            ELSE 'Other' 
+        END AS SalesChannel,
+        SUM(i.Total) AS Revenue
+    FROM invoices i
+    JOIN customers c ON i.CustomerId = c.CustomerId
+    GROUP BY i.InvoiceId
+)
+
+-- Select and aggregate sales channel data
+SELECT
+    scr.SalesChannel, 
+    COUNT(DISTINCT scr.InvoiceId) AS InvoiceCount, 
+    SUM(scr.Revenue) AS TotalRevenue  
+FROM SalesChannelRevenue scr
+GROUP BY scr.SalesChannel
+ORDER BY TotalRevenue DESC; 
+        CASE
+            WHEN UPPER(c.FirstName) || ' ' || UPPER(c.LastName) LIKE '%ONLINE%' THEN 'Online'
+            WHEN UPPER(c.Address) LIKE '%WEB%' THEN 'Online'
+            WHEN c.Country IN ('USA', 'Canada') THEN 'In-Store'
+            ELSE 'Other' 
+        END AS SalesChannel,
+        SUM(i.Total) AS Revenue
+    FROM invoices i
+    JOIN customers c ON i.CustomerId = c.CustomerId
+    GROUP BY i.InvoiceId
+)
+
+-- Select and aggregate sales channel data
+SELECT
+    scr.SalesChannel, 
+    COUNT(DISTINCT scr.InvoiceId) AS InvoiceCount, 
+    SUM(scr.Revenue) AS TotalRevenue  
+FROM SalesChannelRevenue scr
+GROUP BY scr.SalesChannel
+ORDER BY TotalRevenue DESC; 
