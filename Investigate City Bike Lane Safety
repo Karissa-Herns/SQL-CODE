@@ -1,0 +1,59 @@
+-- Create the CityBikeLanes table with appropriate columns and constraints
+CREATE TABLE BIT_DB.CityBikeLanes (
+    id integer primary key,
+    year_installed year not null,
+    year_updated year not null,
+    street varchar not null,
+    width_feet integer not null,
+    safetyrating integer not null,
+    protected varchar not null
+);
+
+-- Insert data into the CityBikeLanes table
+INSERT INTO BIT_DB.CityBikeLanes values(1,2012, 2020, "Chestnut",4,4,"yes");
+INSERT INTO BIT_DB.CityBikeLanes values(2,2016, 2020,"Walnut",4,3.8,"yes");
+-- (Add comments for the rest of the INSERT statements)
+
+-- Select the first 10 rows from the CityBikeLanes table
+SELECT * FROM CityBikeLanes LIMIT 10;
+
+-- Select rows from the CityBikeLanes table where the street is 'Walnut'
+SELECT * FROM CityBikeLanes WHERE street='Walnut';
+
+-- Create a CTE to calculate the average safety rating for each street
+WITH safety_average_cte AS (
+    SELECT street, AVG(safetyrating) as rating
+    FROM citybikelanes
+    GROUP BY street
+)
+
+-- Select streets with a safety rating of 4 or higher and label them as 'safe lane'
+SELECT 
+    street,
+    rating,
+    'safe lane' as 'label'
+FROM safety_average_cte
+WHERE rating >=4;
+
+-- Calculate the average safety rating for each street using a window function
+SELECT street, safetyrating,
+    AVG(safetyrating) OVER (PARTITION BY street) as "Average_safety_rating"
+FROM CityBikeLanes;
+
+-- Create a CTE to calculate the average safety rating for each street
+WITH safety_average_cte AS (
+    SELECT street, AVG(safetyrating) as rating
+    FROM CityBikeLanes
+    GROUP BY street
+)
+
+-- Select streets with their average safety rating and a tag based on safety rating
+SELECT
+    sac.street,
+    sac.rating as "Average_safety_rating",
+    CASE 
+        WHEN sac.rating >= 4 THEN 'Leave-As-Is'
+        WHEN sac.rating < 2.5 THEN 'Remove'
+        ELSE 'Improvements-Needed'
+    END AS tag
+FROM safety_average_cte sac;
